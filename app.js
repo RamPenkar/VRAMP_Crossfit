@@ -1,17 +1,26 @@
 // ---- Data ---------------------------------------------------------------
 // Edit titles/order freely. `slug` must match files in /videos and /posters.
-const VIDEOS = [
-  { slug: 'one-shot',        title: 'One Shot',          tag: 'Brand',   dur: 27 },
-  { slug: 'martin',          title: 'Martin',            tag: 'Landing', dur: 59 },
-  { slug: 'clouds',          title: 'Clouds',            tag: 'Visual',  dur: 11 },
-  { slug: 'reel-01',         title: 'Field Notes 01',    tag: 'Reel',    dur: 30 },
-  { slug: 'whiteboard',      title: 'Whiteboard',        tag: 'Explainer', dur: 57 },
-  { slug: 'reel-02',         title: 'Field Notes 02',    tag: 'Reel',    dur: 23 },
-  { slug: 'imtm',            title: 'IMTM',              tag: 'Brand',   dur: 70 },
-  { slug: 'reel-03',         title: 'Field Notes 03',    tag: 'Reel',    dur: 16 },
-  { slug: 'birthday-battle', title: 'Birthday Battle',   tag: 'Story',   dur: 139 },
-  { slug: 'reel-04',         title: 'Field Notes 04',    tag: 'Reel',    dur: 20 },
-];
+const COLLECTIONS = {
+  work: [
+    { slug: 'one-shot',        title: 'One Shot',          tag: 'Brand',     dur: 27 },
+    { slug: 'martin',          title: 'Martin',            tag: 'Landing',   dur: 59 },
+    { slug: 'clouds',          title: 'Clouds',            tag: 'Visual',    dur: 11 },
+    { slug: 'reel-01',         title: 'Field Notes 01',    tag: 'Reel',      dur: 30 },
+    { slug: 'whiteboard',      title: 'Whiteboard',        tag: 'Explainer', dur: 57 },
+    { slug: 'reel-02',         title: 'Field Notes 02',    tag: 'Reel',      dur: 23 },
+    { slug: 'imtm',            title: 'IMTM',              tag: 'Brand',     dur: 70 },
+    { slug: 'reel-03',         title: 'Field Notes 03',    tag: 'Reel',      dur: 16 },
+    { slug: 'birthday-battle', title: 'Birthday Battle',   tag: 'Story',     dur: 139 },
+    { slug: 'reel-04',         title: 'Field Notes 04',    tag: 'Reel',      dur: 20 },
+  ],
+  stories: [
+    { slug: 'story-1', title: 'Story 01', tag: 'Story', dur: 7 },
+    { slug: 'story-2', title: 'Story 02', tag: 'Story', dur: 11 },
+    { slug: 'story-3', title: 'Story 03', tag: 'Story', dur: 12 },
+  ],
+};
+let activeTab = 'work';
+let VIDEOS = COLLECTIONS[activeTab];
 
 // ---- Helpers ------------------------------------------------------------
 const $  = (s, r = document) => r.querySelector(s);
@@ -43,10 +52,7 @@ const tileHTML = (v, i) => `
   </article>
 `;
 
-grid.innerHTML = VIDEOS.map(tileHTML).join('');
-const tiles = $$('.tile', grid);
-
-// ---- Reveal on scroll ---------------------------------------------------
+const canHover = matchMedia('(hover: hover) and (pointer: fine)').matches;
 const reveal = new IntersectionObserver((entries) => {
   entries.forEach(e => {
     if (e.isIntersecting) {
@@ -57,32 +63,62 @@ const reveal = new IntersectionObserver((entries) => {
     }
   });
 }, { threshold: 0.1, rootMargin: '0px 0px -8% 0px' });
-tiles.forEach(t => reveal.observe(t));
 
-// ---- Hover preview (desktop) -------------------------------------------
-const canHover = matchMedia('(hover: hover) and (pointer: fine)').matches;
-if (canHover) {
-  let active = null;
-  tiles.forEach(tile => {
-    const video = tile.querySelector('video');
-    const slug = tile.dataset.slug;
-    let primed = false;
-    tile.addEventListener('mouseenter', () => {
-      if (active && active !== video) { active.pause(); active.closest('.tile').classList.remove('preview'); }
-      if (!primed) { video.src = `videos/${slug}.mp4`; primed = true; }
-      video.currentTime = 0;
-      const p = video.play();
-      if (p) p.catch(() => {});
-      tile.classList.add('preview');
-      active = video;
+const renderGrid = () => {
+  grid.innerHTML = VIDEOS.map(tileHTML).join('');
+  const tiles = $$('.tile', grid);
+  tiles.forEach(t => reveal.observe(t));
+
+  if (canHover) {
+    let active = null;
+    tiles.forEach(tile => {
+      const video = tile.querySelector('video');
+      const slug = tile.dataset.slug;
+      let primed = false;
+      tile.addEventListener('mouseenter', () => {
+        if (active && active !== video) { active.pause(); active.closest('.tile').classList.remove('preview'); }
+        if (!primed) { video.src = `videos/${slug}.mp4`; primed = true; }
+        video.currentTime = 0;
+        const p = video.play();
+        if (p) p.catch(() => {});
+        tile.classList.add('preview');
+        active = video;
+      });
+      tile.addEventListener('mouseleave', () => {
+        video.pause();
+        tile.classList.remove('preview');
+        if (active === video) active = null;
+      });
     });
-    tile.addEventListener('mouseleave', () => {
-      video.pause();
-      tile.classList.remove('preview');
-      if (active === video) active = null;
+  }
+
+  tiles.forEach(tile => {
+    const open = () => openViewer(Number(tile.dataset.index));
+    tile.addEventListener('click', open);
+    tile.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
     });
   });
-}
+};
+
+// ---- Tab switching ------------------------------------------------------
+const switchTab = (tab) => {
+  if (tab === activeTab || !COLLECTIONS[tab]) return;
+  activeTab = tab;
+  VIDEOS = COLLECTIONS[tab];
+  $$('.tab').forEach(t => {
+    const on = t.dataset.tab === tab;
+    t.classList.toggle('is-active', on);
+    t.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  grid.setAttribute('aria-labelledby', `tab-${tab}`);
+  grid.classList.add('swapping');
+  setTimeout(() => {
+    renderGrid();
+    grid.classList.remove('swapping');
+  }, 180);
+};
+$$('.tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
 
 // ---- Immersive viewer ---------------------------------------------------
 const viewer    = $('#viewer');
@@ -125,13 +161,7 @@ const closeViewer = () => {
   if (lastFocused && lastFocused.focus) lastFocused.focus({ preventScroll: true });
 };
 
-tiles.forEach(tile => {
-  const open = () => openViewer(Number(tile.dataset.index));
-  tile.addEventListener('click', open);
-  tile.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
-  });
-});
+renderGrid();
 
 vClose.addEventListener('click', closeViewer);
 vPrev.addEventListener('click', () => loadInto(currentIdx - 1));

@@ -145,15 +145,36 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between;
   gap: 12px; padding-bottom: 24px; margin-bottom: 28px; border-bottom: 1px solid var(--line);
 }
-.section-head h2 {
-  font-family: 'Inter Tight', sans-serif; font-weight: 800;
-  font-size: clamp(22px, 4vw, 34px); letter-spacing: -.01em; margin: 0;
-  display: inline-flex; align-items: baseline; gap: 14px;
-}
-.section-head .num {
-  color: var(--accent); font-size: .55em; font-weight: 700; letter-spacing: .12em;
-}
 .section-head p { color: var(--muted); margin: 0; font-size: 14px; }
+
+/* Tabs */
+.tabs { display: inline-flex; gap: clamp(16px, 3vw, 32px); flex-wrap: wrap; }
+.tab {
+  position: relative; padding: 6px 0 12px; cursor: pointer;
+  font-family: 'Inter Tight', sans-serif; font-weight: 800;
+  font-size: clamp(18px, 3.8vw, 32px); letter-spacing: -.01em;
+  color: var(--muted);
+  display: inline-flex; align-items: baseline; gap: 8px;
+  transition: color .25s var(--ease);
+}
+.tab .num {
+  color: var(--muted); font-size: .55em; font-weight: 700; letter-spacing: .12em;
+  transition: color .25s var(--ease);
+}
+.tab:hover { color: var(--fg); }
+.tab:hover .num { color: var(--accent); }
+.tab.is-active { color: var(--fg); }
+.tab.is-active .num { color: var(--accent); }
+.tab::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 4px;
+  height: 2px; background: var(--accent); border-radius: 2px;
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .35s var(--ease);
+}
+.tab.is-active::after { transform: scaleX(1); }
+
+/* Grid fade when swapping tabs */
+.grid.swapping { opacity: 0; transition: opacity .18s var(--ease); }
 
 .grid {
   display: grid;

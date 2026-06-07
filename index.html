@@ -51,10 +51,19 @@
 
     <section id="work" class="work">
       <div class="section-head">
-        <h2><span class="num">01</span> Selected Work</h2>
+        <div class="tabs" role="tablist" aria-label="Reel collections">
+          <button class="tab is-active" role="tab" aria-selected="true" data-tab="work" id="tab-work">
+            <span class="num">01</span>
+            <span class="label">Selected Work</span>
+          </button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="stories" id="tab-stories">
+            <span class="num">02</span>
+            <span class="label">Story Examples</span>
+          </button>
+        </div>
         <p>Tap any tile to play. Swipe between pieces.</p>
       </div>
-      <div class="grid" id="grid"></div>
+      <div class="grid" id="grid" role="tabpanel" aria-labelledby="tab-work"></div>
     </section>
 
     <section id="contact" class="contact">
