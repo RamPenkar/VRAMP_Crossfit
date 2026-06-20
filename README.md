@@ -1,14 +1,14 @@
-# VRAMP × PrimeMotion — Selected Work
+# VRAMP × CrossFit — Selected Work
 
-A single-page reel site for VRAMP × PrimeMotion. Vertical videos, immersive viewer, mobile-first.
+A single-page reel site for VRAMP × CrossFit. Vertical videos, immersive viewer, mobile-first.
 
 ## Quick deploy to GitHub Pages
 
-1. Create a new repo on GitHub (public). Name it whatever you want — e.g. `primemotion-reel`.
+1. Create a new repo on GitHub (public). Name it whatever you want — e.g. `VRAMP_Crossfit`.
 2. From this folder:
 
    ```bash
-   cd ~/primemotion-reel
+   cd ~/VRAMP_Crossfit
    git init
    git add .
    git commit -m "Initial reel"
