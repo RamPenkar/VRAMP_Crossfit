@@ -21,7 +21,6 @@ const COLLECTIONS = {
   stories: [
     { slug: 'story-1', title: 'Story 01', tag: 'Story', dur: 7 },
     { slug: 'story-2', title: 'Story 02', tag: 'Story', dur: 11 },
-    { slug: 'story-3', title: 'Story 03', tag: 'Story', dur: 12 },
   ],
 };
 let activeTab = 'work';
